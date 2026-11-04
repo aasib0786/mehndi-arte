@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-henna: #5A1E1B;
+    --color-henna-dark: #3D1311;
+    --color-mehndi: #3F4A2A;
+    --color-ivory: #F7F1E6;
+    --color-gold: #B8893A;
+    --color-charcoal: #231F1C;
+  }
+
+  html {
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    color: #231F1C;
+    background-color: #F7F1E6;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Lenis smooth scroll recommended base */
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: rgba(184, 137, 58, 0.25);
+    color: #5A1E1B;
+  }
+}
+
+/* Subtle hand-made paper grain texture */
+.paper-grain {
+  background-color: #F7F1E6;
+  background-image: radial-gradient(rgba(90, 30, 27, 0.035) 1px, transparent 0),
+    radial-gradient(rgba(184, 137, 58, 0.03) 1px, #F7F1E6 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Authentic handmade paper edge and card style */
+.editorial-card {
+  background-color: #FCF9F3;
+  border: 1px solid rgba(184, 137, 58, 0.25);
+  box-shadow: 0 10px 30px -15px rgba(35, 31, 28, 0.05);
+}
+
+/* Thin Antique Gold Divider Utilities */
+.gold-divider {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(184, 137, 58, 0.15) 15%,
+    rgba(184, 137, 58, 0.75) 50%,
+    rgba(184, 137, 58, 0.15) 85%,
+    transparent 100%
+  );
+}
+
+.gold-divider-subtle {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(184, 137, 58, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+.gold-divider-vertical {
+  position: relative;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(184, 137, 58, 0.6) 50%,
+    transparent 100%
+  );
+}
+
+/* Micro corner brackets for heritage luxury flair */
+.ornate-corners {
+  position: relative;
+}
+.ornate-corners::before,
+.ornate-corners::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+.ornate-corners::before {
+  top: 8px;
+  left: 8px;
+  border-top: 1px solid #B8893A;
+  border-left: 1px solid #B8893A;
+}
+.ornate-corners::after {
+  bottom: 8px;
+  right: 8px;
+  border-bottom: 1px solid #B8893A;
+  border-right: 1px solid #B8893A;
+}
+
+/* Custom editorial link with gentle gold underline trace */
+.editorial-link {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.editorial-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #B8893A;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.editorial-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Custom scrollbar matching brand palette */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F1E6;
+}
+::-webkit-scrollbar-thumb {
+  background: #B8893A;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5A1E1B;
+}
+
+
+/* Custom Cursor Hiding for Fine Pointer Devices */
+@media (pointer: fine) and (hover: hover) {
+  body.custom-cursor-enabled,
+  body.custom-cursor-enabled a,
+  body.custom-cursor-enabled button,
+  body.custom-cursor-enabled [role="button"],
+  body.custom-cursor-enabled .cursor-pointer {
+    cursor: none !important;
+  }
+  body.custom-cursor-enabled input,
+  body.custom-cursor-enabled textarea {
+    cursor: text !important;
+  }
+}
+
+/* Accessibility: Strict Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
