@@ -4,6 +4,7 @@ import { MandalaMotif } from '@/components/motifs';
 interface EditorialImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
+  placeholder?: string;
   className?: string;
   containerClassName?: string;
   fallbackTitle?: string;
@@ -14,11 +15,12 @@ interface EditorialImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
 export const EditorialImage: React.FC<EditorialImageProps> = ({
   src,
   alt,
+  placeholder,
   className = '',
   containerClassName = '',
   fallbackTitle = 'Royal Bridal Henna',
   fallbackSubtitle = 'Handcrafted Sojat Archive',
-  aspectRatio = '4/5',
+  aspectRatio,
   ...props
 }) => {
   const [hasError, setHasError] = useState<boolean>(false);
@@ -27,23 +29,42 @@ export const EditorialImage: React.FC<EditorialImageProps> = ({
   return (
     <div
       className={`relative overflow-hidden bg-ivory-warm/40 border border-gold/25 select-none ${containerClassName}`}
-      style={{ aspectRatio }}
+      style={aspectRatio ? { aspectRatio } : undefined}
     >
       {!hasError ? (
         <>
-          {/* Subtle loading placeholder shimmer */}
-          {!isLoaded && (
-            <div className="absolute inset-0 bg-ivory paper-grain flex items-center justify-center text-gold/30">
-              <MandalaMotif size={64} className="animate-spin" style={{ animationDuration: '30s' }} />
+          {/* Shimmering Blur Placeholder while image loads */}
+          {!isLoaded && placeholder && (
+            <img
+              src={placeholder}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover filter blur-md scale-105 z-10 pointer-events-none"
+            />
+          )}
+
+          {!isLoaded && !placeholder && (
+            <div
+              className="absolute inset-0 bg-ivory paper-grain flex items-center justify-center text-gold/30 z-10 transition-opacity duration-500"
+              style={{ filter: 'blur(8px)' }}
+            >
+              <MandalaMotif size={64} className="animate-spin-slow opacity-40" />
             </div>
           )}
 
           <img
             src={src}
             alt={alt}
+            loading="lazy"
+            decoding="async"
             onLoad={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
-            className={`w-full h-full object-cover transition-opacity duration-700 ${
+            style={{
+              filter: isLoaded ? 'blur(0px)' : 'blur(12px)',
+              transform: isLoaded ? 'scale(1)' : 'scale(1.05)',
+              transition: 'filter 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease-out',
+            }}
+            className={`w-full h-full object-cover ${
               isLoaded ? 'opacity-100' : 'opacity-0'
             } ${className}`}
             {...props}
@@ -74,4 +95,3 @@ export const EditorialImage: React.FC<EditorialImageProps> = ({
     </div>
   );
 };
-

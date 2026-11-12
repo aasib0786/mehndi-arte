@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { brandConfig } from '@/lib/config';
 import { useReducedMotion } from '@/lib/useReducedMotion';
+import {
+  LotusFloretMotif,
+  OrnateCornerFlourish,
+  HathphoolChainMotif,
+} from '@/components/motifs';
 
 interface CounterProps {
   end: number;
@@ -32,7 +37,6 @@ const CountUp: React.FC<CounterProps> = ({
     const step = (timestamp: number) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      // EaseOutCubic formula
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(easeProgress * end));
 
@@ -67,7 +71,7 @@ export const TrustStrip: React.FC = () => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect(); // Fire once
+          observer.disconnect();
         }
       },
       { threshold: 0.25 }
@@ -82,46 +86,105 @@ export const TrustStrip: React.FC = () => {
 
   const trustMetrics = [
     {
+      hallmark: 'HALLMARK I',
+      hindiTag: 'अनुभव',
       value: brandConfig.stats.experienceYears,
       suffix: '+',
-      title: 'Years Experience',
-      subtitle: 'Master fine-line henna craftsmanship',
+      title: 'Years Atelier Mastery',
+      subtitle: 'Bespoke fine-line symmetry & bridal couture',
     },
     {
+      hallmark: 'HALLMARK II',
+      hindiTag: 'विश्वास',
       value: brandConfig.stats.happyBrides,
       suffix: '+',
-      title: 'Cherished Brides',
-      subtitle: 'Across India & destination weddings',
+      title: 'Celebrated Brides',
+      subtitle: 'Intimate ceremonies & grand destination weddings',
     },
     {
+      hallmark: 'HALLMARK III',
+      hindiTag: 'शुद्धता',
       value: 100,
       suffix: '%',
-      title: 'Natural Organic Henna',
-      subtitle: 'Pure Sojat leaves & essential oils',
+      title: 'Organic Sojat Leaves',
+      subtitle: 'Zero synthetic dyes, PPD, or chemical catalysts',
     },
     {
-      customDisplay: 'Doorstep',
+      hallmark: 'HALLMARK IV',
+      hindiTag: 'सौंदर्य',
+      value: brandConfig.makeupBrandsUsed.length,
+      suffix: '+ Luxury',
+      title: 'Global Cosmetic Houses',
+      subtitle: `${brandConfig.makeupBrandsUsed.slice(0, 3).join(', ')} & Dior Backstage`,
+    },
+    {
+      hallmark: 'HALLMARK V',
+      hindiTag: 'आतिथ्य',
+      customDisplay: 'Home + Studio',
       suffix: 'Service',
-      title: 'Home Visit Service',
-      subtitle: `${brandConfig.city} & destination venues`,
+      title: 'Doorstep & GK-1 Salon',
+      subtitle: `Venue suites across ${brandConfig.city} & flagship parlour`,
     },
   ];
 
   return (
     <section
       ref={sectionRef}
-      className="bg-ivory-light border-y border-gold/25 py-12 px-6 lg:px-12 relative overflow-hidden select-none"
+      className="bg-[#FAF5ED] border-y border-gold/30 py-12 sm:py-16 px-4 sm:px-6 lg:px-12 relative overflow-hidden select-none"
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 divide-y-2 lg:divide-y-0 lg:divide-x divide-gold/15">
+      {/* Handcrafted Chain Trim at Top & Bottom */}
+      <div className="absolute top-0 left-0 right-0 pointer-events-none opacity-40">
+        <HathphoolChainMotif height={12} color="#B8893A" />
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none opacity-40">
+        <HathphoolChainMotif height={12} color="#B8893A" />
+      </div>
+
+      {/* Handcrafted Corner Flourishes */}
+      <div className="absolute top-3 left-3 text-gold/35 pointer-events-none hidden sm:block">
+        <OrnateCornerFlourish size={32} />
+      </div>
+      <div className="absolute top-3 right-3 text-gold/35 pointer-events-none rotate-90 hidden sm:block">
+        <OrnateCornerFlourish size={32} />
+      </div>
+      <div className="absolute bottom-3 left-3 text-gold/35 pointer-events-none -rotate-90 hidden sm:block">
+        <OrnateCornerFlourish size={32} />
+      </div>
+      <div className="absolute bottom-3 right-3 text-gold/35 pointer-events-none rotate-180 hidden sm:block">
+        <OrnateCornerFlourish size={32} />
+      </div>
+
+      {/* Subtle Center Watermark */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gold/8 pointer-events-none">
+        <LotusFloretMotif size={220} />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-2">
           {trustMetrics.map((item, idx) => (
             <div
               key={idx}
-              className={`flex flex-col items-center text-center ${
-                idx > 1 ? 'pt-6 lg:pt-0' : ''
-              } ${idx % 2 !== 0 && idx < 2 ? 'pt-0' : ''} px-2 lg:px-6`}
+              className={`flex flex-col items-center text-center p-4 sm:p-5 relative group transition-all duration-300 hover:bg-ivory-light/60 ${
+                idx === 4 ? 'col-span-2 md:col-span-1' : ''
+              }`}
             >
-              <div className="font-serif text-3xl sm:text-4xl lg:text-5xl text-henna font-medium tracking-tight mb-1">
+              {/* Medallion Arched Outer Frame */}
+              <div className="w-full max-w-[210px] pb-2 border-b border-gold/25 relative">
+                {/* Hindi Cultural Watermark */}
+                <span className="font-serif text-sm text-gold-dark/30 font-medium block mb-0.5 tracking-wider">
+                  {item.hindiTag}
+                </span>
+
+                {/* Hallmark Roman Label */}
+                <div className="inline-flex items-center gap-1.5 text-[8px] sm:text-[9px] uppercase tracking-[0.26em] text-gold-dark font-sans font-medium">
+                  <span className="text-[6px]">✦</span>
+                  <span>{item.hallmark}</span>
+                  <span className="text-[6px]">✦</span>
+                </div>
+              </div>
+
+              {/* Main Number or Display */}
+              <div className="font-serif text-3xl sm:text-4xl lg:text-5xl text-henna font-normal tracking-tight my-2">
                 {item.value !== undefined ? (
                   <CountUp
                     end={item.value}
@@ -129,18 +192,22 @@ export const TrustStrip: React.FC = () => {
                     isVisible={isVisible}
                   />
                 ) : (
-                  <span>
-                    {item.customDisplay}{' '}
-                    <span className="font-vibes text-gold text-2xl sm:text-3xl ml-1">
+                  <span className="flex flex-col items-center">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-serif text-henna">
+                      {item.customDisplay}
+                    </span>
+                    <span className="font-vibes text-gold text-lg sm:text-xl -mt-1">
                       {item.suffix}
                     </span>
                   </span>
                 )}
               </div>
-              <div className="text-xs uppercase tracking-[0.2em] text-charcoal font-medium mt-1">
+
+              {/* Title & Description with Editorial Typography */}
+              <div className="text-[11px] sm:text-xs uppercase tracking-[0.18em] text-charcoal font-medium">
                 {item.title}
               </div>
-              <div className="text-xs text-charcoal-soft font-light mt-1 max-w-[200px]">
+              <div className="text-[11px] text-charcoal-muted font-light mt-1 max-w-[190px] leading-relaxed">
                 {item.subtitle}
               </div>
             </div>
@@ -150,4 +217,3 @@ export const TrustStrip: React.FC = () => {
     </section>
   );
 };
-

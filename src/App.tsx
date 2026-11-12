@@ -11,21 +11,54 @@ import { Preloader } from '@/components/common/Preloader';
 import { PageTransition } from '@/components/common/PageTransition';
 import { useReducedMotion } from '@/lib/useReducedMotion';
 import { BookingProvider } from '@/context/BookingContext';
+import { captureAttribution } from '@/lib/attribution';
+import { initTracking, trackPageView } from '@/lib/tracking';
 
 import { HomePage } from '@/pages/HomePage';
-import { GalleryPage } from '@/pages/GalleryPage';
-import { BridalMehndiPage } from '@/pages/BridalMehndiPage';
-import { ThankYouPage } from '@/pages/ThankYouPage';
+
+// Lazy-loaded routes for code-splitting and faster initial page performance
+const GalleryPage = React.lazy(() =>
+  import('@/pages/GalleryPage').then((m) => ({ default: m.GalleryPage }))
+);
+const BridalMehndiPage = React.lazy(() =>
+  import('@/pages/BridalMehndiPage').then((m) => ({ default: m.BridalMehndiPage }))
+);
+const MehndiPage = React.lazy(() =>
+  import('@/pages/MehndiPage').then((m) => ({ default: m.MehndiPage }))
+);
+const MakeupPage = React.lazy(() =>
+  import('@/pages/MakeupPage').then((m) => ({ default: m.MakeupPage }))
+);
+const ParlourPage = React.lazy(() =>
+  import('@/pages/ParlourPage').then((m) => ({ default: m.ParlourPage }))
+);
+const BridalMakeupPage = React.lazy(() =>
+  import('@/pages/BridalMakeupPage').then((m) => ({ default: m.BridalMakeupPage }))
+);
+const BridalComboPage = React.lazy(() =>
+  import('@/pages/BridalComboPage').then((m) => ({ default: m.BridalComboPage }))
+);
+const ThankYouPage = React.lazy(() =>
+  import('@/pages/ThankYouPage').then((m) => ({ default: m.ThankYouPage }))
+);
+
+// Fallback loader while route chunk loads
+const RouteLoadingFallback: React.FC = () => (
+  <div className="min-h-[50vh] flex items-center justify-center p-12" aria-label="Loading page">
+    <div className="w-7 h-7 rounded-full border-2 border-gold/30 border-t-gold animate-spin" />
+  </div>
+);
 
 // Register GSAP ScrollTrigger plugin once globally
 gsap.registerPlugin(ScrollTrigger);
 
-// Scroll to top on route change
+// Scroll to top and track page view on route change
 const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    trackPageView(pathname);
   }, [pathname]);
 
   return null;
@@ -36,8 +69,9 @@ const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    // If user prefers reduced motion, disable custom smooth scrolling
-    if (prefersReducedMotion) {
+    // On touch devices / mobile, disable Lenis to ensure native 120Hz/60Hz hardware momentum scrolling without touch lag or CPU overhead
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    if (prefersReducedMotion || isMobile) {
       return;
     }
 
@@ -47,7 +81,7 @@ const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1.0,
     });
 
     // Synchronize Lenis scroll position with GSAP ScrollTrigger
@@ -76,53 +110,102 @@ const AnimatedRoutes: React.FC = () => {
 
   return (
     <AnimatePresence mode="wait" initial={false}>
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <PageTransition>
-              <HomePage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/gallery"
-          element={
-            <PageTransition>
-              <GalleryPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/services/bridal-mehndi"
-          element={
-            <PageTransition>
-              <BridalMehndiPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/thank-you"
-          element={
-            <PageTransition>
-              <ThankYouPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <PageTransition>
-              <HomePage />
-            </PageTransition>
-          }
-        />
-      </Routes>
+      <React.Suspense fallback={<RouteLoadingFallback />}>
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              <PageTransition>
+                <HomePage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/mehndi"
+            element={
+              <PageTransition>
+                <MehndiPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/makeup"
+            element={
+              <PageTransition>
+                <MakeupPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/parlour"
+            element={
+              <PageTransition>
+                <ParlourPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <PageTransition>
+                <GalleryPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/services/bridal-mehndi"
+            element={
+              <PageTransition>
+                <BridalMehndiPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/services/bridal-makeup"
+            element={
+              <PageTransition>
+                <BridalMakeupPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/services/bridal-combo"
+            element={
+              <PageTransition>
+                <BridalComboPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/thank-you"
+            element={
+              <PageTransition>
+                <ThankYouPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <PageTransition>
+                <HomePage />
+              </PageTransition>
+            }
+          />
+        </Routes>
+      </React.Suspense>
     </AnimatePresence>
   );
 };
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Capture and persist UTMs, gclid, fbclid on first page visit
+    captureAttribution();
+    // Initialize Meta Pixel, GA4, and Google Ads tags conditionally
+    initTracking();
+  }, []);
+
   return (
     <HelmetProvider>
       <BookingProvider>

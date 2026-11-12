@@ -1,21 +1,56 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { brandConfig } from '@/lib/config';
 import { useReducedMotion } from '@/lib/useReducedMotion';
+import { trackWhatsAppClick } from '@/lib/tracking';
 
 export const WhatsAppButton: React.FC = () => {
+  const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
 
-  const message = 'Hi, I want to enquire about mehndi booking';
+  const isAdLandingPage = location.pathname.startsWith('/services/bridal-');
+
+  const getServiceType = (path: string): string => {
+    if (path.startsWith('/mehndi') || path === '/services/bridal-mehndi') return 'Mehndi';
+    if (path.startsWith('/makeup') || path === '/services/bridal-makeup') return 'Makeup';
+    if (path.startsWith('/parlour')) return 'Parlour';
+    if (path === '/services/bridal-combo') return 'Bridal Combo';
+    return 'General';
+  };
+
+  // Dynamic context-aware enquiry message
+  const getEnquiryMessage = (path: string): string => {
+    if (path.startsWith('/mehndi') || path === '/services/bridal-mehndi') {
+      return 'Hi, I want to enquire about mehndi booking';
+    }
+    if (path.startsWith('/makeup') || path === '/services/bridal-makeup') {
+      return 'Hi, I want to enquire about makeup booking';
+    }
+    if (path.startsWith('/parlour')) {
+      return 'Hi, I want to enquire about parlour booking';
+    }
+    if (path === '/services/bridal-combo') {
+      return 'Hi, I want to enquire about bridal combo (mehndi + makeup) booking';
+    }
+    return 'Hi, I want to enquire about mehndi / makeup / parlour booking';
+  };
+
+  const message = getEnquiryMessage(location.pathname);
+  const serviceType = getServiceType(location.pathname);
   const waUrl = `https://wa.me/${brandConfig.whatsAppNumber}?text=${encodeURIComponent(message)}`;
 
   return (
-    <aside aria-label="WhatsApp Concierge" className="fixed bottom-6 right-6 z-40">
+    <aside
+      aria-label="WhatsApp Concierge"
+      className={`fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 ${isAdLandingPage ? 'hidden lg:block' : ''}`}
+    >
       <a
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Inquire about bridal mehndi booking on WhatsApp"
-        className="group relative flex items-center justify-center"
+        onClick={() => trackWhatsAppClick('Floating Pulsing WhatsApp Button', serviceType)}
+        aria-label={message}
+        className="group relative flex items-center justify-center touch-manipulation"
       >
         {/* Ambient gentle pulse rings (disabled if user prefers reduced motion) */}
         {!prefersReducedMotion && (
@@ -31,8 +66,8 @@ export const WhatsAppButton: React.FC = () => {
           Inquire via WhatsApp
         </span>
 
-        {/* Button Icon Container */}
-        <div className="relative w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-henna text-ivory border-2 border-gold flex items-center justify-center shadow-gold group-hover:scale-105 group-hover:bg-henna-dark transition-all duration-300">
+        {/* Button Icon Container (56px min tap target for mobile touch accessibility) */}
+        <div className="relative w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-henna text-ivory border-2 border-gold flex items-center justify-center shadow-gold group-hover:scale-105 group-hover:bg-henna-dark transition-all duration-300">
           {/* WhatsApp SVG Icon */}
           <svg
             viewBox="0 0 24 24"

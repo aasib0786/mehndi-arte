@@ -2,26 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { brandConfig } from '@/lib/config';
 import { useReducedMotion } from '@/lib/useReducedMotion';
+import { MehndiConeMotif, MakeupBrushMotif } from '@/components/motifs';
 
 interface PreloaderProps {
   onComplete?: () => void;
 }
 
-const STORAGE_KEY = 'kashish_mehndi_preloader_seen';
+const STORAGE_KEY = 'kashish_studio_preloader_seen';
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    // Check session storage
     const seen = sessionStorage.getItem(STORAGE_KEY);
     return !seen;
   });
 
-  const [step, setStep] = useState<number>(1); // 1: Drawing mandala, 2: Letters reveal, 3: Exit
+  // Animation timeline stages:
+  // 1: Mehndi cone draws mandala (0 - 800ms)
+  // 2: Makeup brush stroke sweeps across (800ms - 1350ms)
+  // 3: Brand name letter-by-letter reveal (1350ms - 2000ms)
+  // 4: Exit wipe (2000ms - 2400ms)
+  const [stage, setStage] = useState<number>(1);
 
   useEffect(() => {
-    // If reduced motion or already seen, skip immediately
+    // If user prefers reduced motion or already seen in this session, skip immediately
     if (prefersReducedMotion || !isVisible) {
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(STORAGE_KEY, 'true');
@@ -31,19 +36,26 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       return;
     }
 
-    // Phase 1 -> Phase 2: Mandala drawn, reveal letters at 900ms
+    // Step 2: Brush sweep starts at 800ms
     const timer1 = setTimeout(() => {
-      setStep(2);
-    }, 900);
+      setStage(2);
+    }, 800);
 
-    // Phase 2 -> Phase 3: Start exit transition at 1900ms
+    // Step 3: Brand name letters reveal at 1350ms
     const timer2 = setTimeout(() => {
-      setStep(3);
-    }, 1900);
+      setStage(3);
+    }, 1350);
 
-    // Complete by 2400ms (max 2.5s requirement)
+    // Step 4: Begin exit at 2000ms
     const timer3 = setTimeout(() => {
-      sessionStorage.setItem(STORAGE_KEY, 'true');
+      setStage(4);
+    }, 2000);
+
+    // Final completion: total runtime ~2.4s (strictly under 2.5s)
+    const timer4 = setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(STORAGE_KEY, 'true');
+      }
       setIsVisible(false);
       onComplete?.();
     }, 2400);
@@ -52,11 +64,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timer4);
     };
   }, [isVisible, prefersReducedMotion, onComplete]);
 
   const handleSkip = () => {
-    sessionStorage.setItem(STORAGE_KEY, 'true');
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(STORAGE_KEY, 'true');
+    }
     setIsVisible(false);
     onComplete?.();
   };
@@ -69,31 +84,33 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          key="preloader"
+          key="preloader-overlay"
           initial={{ opacity: 1 }}
           exit={{
             y: '-100%',
-            transition: { duration: 0.6, ease: [0.76, 0, 0.24, 1] },
+            opacity: 0.9,
+            transition: { duration: 0.55, ease: [0.76, 0, 0.24, 1] },
           }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ivory paper-grain text-charcoal select-none overflow-hidden"
-          style={{ willChange: 'transform' }}
+          style={{ willChange: 'transform, opacity' }}
         >
-          {/* Subtle gold framing border */}
-          <div className="absolute inset-4 sm:inset-8 border border-gold/25 pointer-events-none" />
+          {/* Subtle gold double framing border */}
+          <div className="absolute inset-4 sm:inset-8 border border-gold/30 pointer-events-none" />
+          <div className="absolute inset-6 sm:inset-10 border border-gold/15 pointer-events-none" />
 
           {/* Skip CTA */}
           <button
             onClick={handleSkip}
-            className="absolute top-8 right-8 z-10 text-[11px] uppercase tracking-[0.2em] text-charcoal-soft hover:text-henna transition-colors py-2 px-3"
+            className="absolute top-8 right-8 z-10 text-[10px] uppercase tracking-[0.22em] text-charcoal-soft hover:text-henna transition-colors py-2 px-3 border border-gold/20 hover:border-gold"
             aria-label="Skip intro animation"
           >
-            Skip Intro
+            Skip Intro ↗
           </button>
 
           <div className="relative flex flex-col items-center justify-center max-w-lg mx-auto px-6 text-center">
-            {/* SVG Illustration Container */}
-            <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center mb-8">
-              {/* Animating Mandala SVG */}
+            {/* SVG Visual Stage: Mandala + Cone + Makeup Brush */}
+            <div className="relative w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center mb-6">
+              {/* 1. Handcrafted Mandala Canvas */}
               <svg
                 viewBox="0 0 100 100"
                 fill="none"
@@ -109,43 +126,43 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                   strokeWidth="1.2"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  transition={{ duration: 0.45, ease: 'easeInOut' }}
                 />
 
-                {/* Inner Ring */}
+                {/* Inner Dotted Ring */}
                 <motion.circle
                   cx="50"
                   cy="50"
-                  r="14"
+                  r="13"
                   stroke="#5A1E1B"
                   strokeWidth="1.2"
                   strokeDasharray="2 2"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.15, ease: 'easeInOut' }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: 'easeInOut' }}
                 />
 
-                {/* 8 Lotus Petals */}
+                {/* 8 Sacred Petals */}
                 <motion.path
                   d="M50 34 C53 40 57 40 57 45 C57 50 50 50 50 50 C50 50 43 50 43 45 C43 40 47 40 50 34 Z M50 66 C53 60 57 60 57 55 C57 50 50 50 50 50 C50 50 43 50 43 55 C43 60 47 60 50 66 Z M34 50 C40 53 40 57 45 57 C50 57 50 50 50 50 C50 50 50 43 45 43 C40 43 40 47 34 50 Z M66 50 C60 53 60 57 55 57 C50 57 50 50 50 50 C50 50 50 43 55 43 C60 43 60 47 66 50 Z"
                   stroke="#B8893A"
-                  strokeWidth="1.1"
+                  strokeWidth="1.15"
                   strokeLinecap="round"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.25, ease: 'easeInOut' }}
+                  transition={{ duration: 0.7, delay: 0.2, ease: 'easeInOut' }}
                 />
 
-                {/* Outer Ring & Petal Scallops */}
+                {/* Outer Scallop Contour */}
                 <motion.circle
                   cx="50"
                   cy="50"
-                  r="28"
+                  r="27"
                   stroke="#B8893A"
                   strokeWidth="1"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.9, delay: 0.35, ease: 'easeInOut' }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: 'easeInOut' }}
                 />
 
                 <motion.path
@@ -155,64 +172,110 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                   strokeLinecap="round"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.0, delay: 0.45, ease: 'easeInOut' }}
+                  transition={{ duration: 0.85, delay: 0.4, ease: 'easeInOut' }}
                 />
+
+                {/* Sweeping Soft Rose / Gold Makeup Brush Stroke Arc */}
+                <motion.path
+                  d="M 18 72 C 32 68, 50 36, 82 24"
+                  stroke="url(#brushStrokeGradient)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={
+                    stage >= 2
+                      ? { pathLength: 1, opacity: 0.85 }
+                      : { pathLength: 0, opacity: 0 }
+                  }
+                  transition={{ duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
+                />
+
+                {/* Secondary Blush Glow Stroke */}
+                <motion.path
+                  d="M 22 76 C 36 72, 54 40, 84 28"
+                  stroke="#C9A193"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="4 2"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={
+                    stage >= 2
+                      ? { pathLength: 1, opacity: 0.7 }
+                      : { pathLength: 0, opacity: 0 }
+                  }
+                  transition={{ duration: 0.55, delay: 0.08, ease: 'easeOut' }}
+                />
+
+                <defs>
+                  <linearGradient id="brushStrokeGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#C9A193" stopOpacity="0.2" />
+                    <stop offset="50%" stopColor="#E8CFC6" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#B8893A" stopOpacity="0.95" />
+                  </linearGradient>
+                </defs>
               </svg>
 
-              {/* Drawing Mehndi Cone */}
+              {/* 2. Mehndi Cone Tracing the Mandala (Stage 1) */}
               <motion.div
                 className="absolute pointer-events-none"
-                initial={{
-                  x: 35,
-                  y: -35,
-                  rotate: -20,
-                  opacity: 0,
-                }}
+                initial={{ x: 30, y: -25, rotate: -15, opacity: 0 }}
                 animate={
-                  step < 3
+                  stage === 1
                     ? {
-                        x: [35, 10, -25, 15, 30],
-                        y: [-35, -20, 10, 30, -10],
-                        rotate: [-20, -10, 5, -15, -25],
+                        x: [30, 8, -20, 10, 24],
+                        y: [-25, -15, 6, 22, -6],
+                        rotate: [-15, -8, 6, -12, -20],
                         opacity: [0, 1, 1, 1, 0.4],
                       }
-                    : { opacity: 0, y: -50 }
+                    : { opacity: 0, scale: 0.8, y: -40 }
                 }
-                transition={{ duration: 1.4, ease: 'easeInOut' }}
+                transition={{ duration: 0.85, ease: 'easeInOut' }}
+                style={{ width: 40, height: 40 }}
+              >
+                <MehndiConeMotif size={40} className="text-henna" />
+              </motion.div>
+
+              {/* 3. Makeup Brush Sweeping Across (Stage 2) */}
+              <motion.div
+                className="absolute pointer-events-none z-20"
+                initial={{ x: -45, y: 35, rotate: 35, opacity: 0 }}
+                animate={
+                  stage === 2
+                    ? {
+                        x: [-45, 0, 48],
+                        y: [35, -5, -42],
+                        rotate: [35, 20, 5],
+                        opacity: [0, 1, 0.9],
+                      }
+                    : stage > 2
+                    ? { opacity: 0, x: 60, y: -50 }
+                    : { opacity: 0 }
+                }
+                transition={{ duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
                 style={{ width: 44, height: 44 }}
               >
-                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full text-henna drop-shadow-sm">
-                  <path
-                    d="M28 20 L78 28 L36 86 Z"
-                    stroke="#5A1E1B"
-                    strokeWidth="2.5"
-                    fill="#5A1E1B"
-                    fillOpacity="0.12"
-                  />
-                  <path d="M36 86 L34 96" stroke="#B8893A" strokeWidth="2.5" strokeLinecap="round" />
-                  <circle cx="34" cy="98" r="2" fill="#B8893A" />
-                </svg>
+                <MakeupBrushMotif size={44} className="text-gold-dark filter drop-shadow-sm" />
               </motion.div>
             </div>
 
-            {/* Brand Name: Letter by Letter Reveal */}
+            {/* Brand Name: Letter-by-Letter Reveal (Stage 3) */}
             <div className="overflow-hidden py-1">
-              <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-henna tracking-[0.22em] font-medium flex items-center justify-center flex-wrap">
+              <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-henna tracking-[0.24em] font-medium flex items-center justify-center flex-wrap">
                 {brandLetters.map((letter, idx) => (
                   <motion.span
                     key={idx}
-                    initial={{ opacity: 0, y: 18 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={
-                      step >= 2
+                      stage >= 3
                         ? { opacity: 1, y: 0 }
-                        : { opacity: 0, y: 18 }
+                        : { opacity: 0, y: 16 }
                     }
                     transition={{
-                      duration: 0.35,
-                      delay: idx * 0.035,
+                      duration: 0.3,
+                      delay: idx * 0.025,
                       ease: [0.25, 1, 0.5, 1],
                     }}
-                    className={letter === ' ' ? 'mx-1.5' : ''}
+                    className={letter === ' ' ? 'mx-1 sm:mx-1.5' : ''}
                   >
                     {letter}
                   </motion.span>
@@ -223,17 +286,17 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             {/* Subtitle Accent */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
-              animate={step >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-              transition={{ duration: 0.5, delay: 0.45 }}
+              animate={stage >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+              transition={{ duration: 0.45, delay: 0.3 }}
               className="font-vibes text-xl sm:text-2xl text-gold-dark mt-2 tracking-wide"
             >
-              Bespoke Bridal Henna Couture
+              Mehndi &bull; Makeup &bull; Parlour Studio
             </motion.p>
 
-            {/* Fine loading hairline */}
-            <div className="w-32 h-[1px] bg-gold/30 mt-6 relative overflow-hidden">
+            {/* Fine loading gold hairline */}
+            <div className="w-36 h-[1.5px] bg-gold/25 mt-6 relative overflow-hidden">
               <motion.div
-                className="absolute inset-y-0 left-0 bg-gold"
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-henna via-gold to-blush"
                 initial={{ width: '0%' }}
                 animate={{ width: '100%' }}
                 transition={{ duration: 2.2, ease: 'easeInOut' }}

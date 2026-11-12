@@ -1,219 +1,212 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { brandConfig } from '@/lib/config';
-import { useBooking } from '@/context/BookingContext';
-import { MandalaMotif, PaisleyMotif } from '@/components/motifs';
+import React from 'react';
+import { brandConfig, getWhatsAppBookingLink } from '@/lib/config';
+import { trackWhatsAppClick } from '@/lib/tracking';
+import { BookingForm } from '@/components/booking/BookingForm';
+import {
+  MandalaMotif,
+  PaisleyMotif,
+  LotusFloretMotif,
+  OrnateCornerFlourish,
+  JharokhaArchMotif,
+  BrushStrokeFlourish,
+  AtelierSealMotif,
+} from '@/components/motifs';
 
 export const ContactSection: React.FC = () => {
-  const { selectedItem, clearSelection } = useBooking();
-
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    date: '',
-    city: brandConfig.city,
-    notes: '',
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const generateWhatsAppMessage = () => {
-    const itemText = selectedItem
-      ? `I am interested in reserving: *${selectedItem.title}* (${selectedItem.price || 'Bespoke Quote'}).`
-      : 'I would like to check wedding date availability for bridal mehndi.';
-
-    const details = [
-      `Hello ${brandConfig.artistName},`,
-      itemText,
-      formData.name ? `Name: ${formData.name}` : '',
-      formData.phone ? `Phone: ${formData.phone}` : '',
-      formData.date ? `Wedding Date: ${formData.date}` : '',
-      formData.city ? `Location/City: ${formData.city}` : '',
-      formData.notes ? `Notes: ${formData.notes}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
-
-    return `https://wa.me/${brandConfig.whatsAppNumber}?text=${encodeURIComponent(details)}`;
-  };
-
   return (
     <section
       id="contact"
-      className="py-24 sm:py-32 px-6 lg:px-12 bg-charcoal text-ivory relative overflow-hidden select-none"
+      className="py-20 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#1C1816] text-ivory relative overflow-hidden select-none border-t border-gold/25"
     >
       {/* Background Watermarks */}
       <div className="absolute top-0 right-0 text-gold/5 pointer-events-none">
-        <MandalaMotif size={420} />
+        <MandalaMotif size={560} />
       </div>
-      <div className="absolute -bottom-10 -left-10 text-henna/15 pointer-events-none">
-        <PaisleyMotif size={240} />
+      <div className="absolute -bottom-16 -left-16 text-henna/15 pointer-events-none">
+        <PaisleyMotif size={320} />
       </div>
 
-      <div className="max-w-5xl mx-auto relative z-10 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold font-medium">
-            <span>✦</span>
-            <span>Reserve Your Commission</span>
-            <span>✦</span>
+      <div className="max-w-7xl mx-auto relative z-10 space-y-16">
+        {/* Editorial Section Header */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end border-b border-gold/20 pb-8">
+          <div className="lg:col-span-8 space-y-3">
+            <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-gold font-medium">
+              <span>✦</span>
+              <span>Atelier Date Reservation · Autumn / Winter 2026</span>
+              <span>✦</span>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-ivory font-normal leading-[1.1]">
+                Reserve Your Bridal Date <br className="hidden sm:inline" />
+                <span className="italic font-light text-gold-light">with Master Artist {brandConfig.artistName}</span>
+              </h2>
+              <BrushStrokeFlourish width={210} height={14} color="#B8893A" />
+            </div>
+
+            <p className="text-sm sm:text-base text-ivory/70 font-light leading-relaxed max-w-2xl">
+              {brandConfig.bookingNotice} To protect the unhurried quality of our heirloom artistry, we accept only one bridal commission per calendar day.
+            </p>
           </div>
 
-          <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-ivory font-normal leading-tight">
-            Check Date Availability
-          </h2>
-
-          <p className="text-sm sm:text-base text-ivory/70 font-light leading-relaxed">
-            {brandConfig.bookingNotice}
-          </p>
-
-          <div className="gold-divider max-w-xs mx-auto pt-2" />
+          <div className="lg:col-span-4 flex justify-start lg:justify-end items-end">
+            <div className="text-left lg:text-right space-y-1">
+              <span className="font-vibes text-2xl sm:text-3xl text-gold block">
+                Doorstep Atelier Service
+              </span>
+              <span className="text-xs text-ivory/60 font-light block">
+                {brandConfig.city} · Pan-India &amp; Destination Suites
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Dynamic Selected Service/Package Banner */}
-        <AnimatePresence>
-          {selectedItem && (
-            <motion.div
-              initial={{ opacity: 0, y: -16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.98 }}
-              className="bg-henna/40 border border-gold/40 p-5 rounded-none flex flex-col sm:flex-row items-center justify-between gap-4 shadow-editorial"
-            >
-              <div className="flex items-center gap-3.5 text-center sm:text-left">
-                <span className="text-gold text-xl">✦</span>
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold-light">
-                    Pre-selected {selectedItem.type === 'package' ? 'Bridal Package' : 'Ceremonial Service'}
-                  </div>
-                  <div className="font-serif text-xl sm:text-2xl text-ivory font-medium">
-                    {selectedItem.title}{' '}
-                    {selectedItem.price && (
-                      <span className="text-gold font-sans text-sm ml-1 font-normal">
-                        ({selectedItem.price})
+        {/* 2-Column Editorial Grid: Left Atelier Concierge Dossier + Right BookingForm */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Left Column (5 cols): Atelier Concierge Dossier */}
+          <div className="lg:col-span-5 space-y-8">
+            {/* The Bespoke Protocol Card with Wax Seal */}
+            <div className="p-7 sm:p-8 bg-[#25201D] border border-gold/40 shadow-fine relative double-hairline-gold">
+              {/* Ornate Corners */}
+              <div className="absolute top-2 left-2 text-gold/30 pointer-events-none">
+                <OrnateCornerFlourish size={24} />
+              </div>
+              <div className="absolute top-2 right-2 text-gold/30 pointer-events-none rotate-90">
+                <OrnateCornerFlourish size={24} />
+              </div>
+              <div className="absolute bottom-2 left-2 text-gold/30 pointer-events-none -rotate-90">
+                <OrnateCornerFlourish size={24} />
+              </div>
+              <div className="absolute bottom-2 right-2 text-gold/30 pointer-events-none rotate-180">
+                <OrnateCornerFlourish size={24} />
+              </div>
+
+              <div className="space-y-6 relative z-10">
+                <div className="flex items-center justify-between border-b border-gold/20 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-gold">
+                      <LotusFloretMotif size={32} />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-[0.24em] text-gold-dark font-medium block">
+                        Atelier Protocol
                       </span>
-                    )}
+                      <h3 className="font-serif text-xl text-ivory font-medium">
+                        What Happens Next
+                      </h3>
+                    </div>
+                  </div>
+                  <AtelierSealMotif size={60} sealColor="#B8893A" textColor="#FAF5ED" />
+                </div>
+
+                {/* 3 Step Protocol Timeline */}
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3.5">
+                    <span className="font-serif text-sm text-gold border border-gold/40 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs uppercase tracking-wider text-ivory font-medium block">
+                        Instant WhatsApp Dispatch
+                      </strong>
+                      <p className="text-xs text-ivory/60 font-light leading-relaxed">
+                        Submitting this reservation dispatches your date request directly to Kashish's personal concierge phone.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <span className="font-serif text-sm text-gold border border-gold/40 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs uppercase tracking-wider text-ivory font-medium block">
+                        Design Consultation Call
+                      </strong>
+                      <p className="text-xs text-ivory/60 font-light leading-relaxed">
+                        We review your wedding lehenga embroidery, jewelry sleeve length, and personal love-story elements.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <span className="font-serif text-sm text-gold border border-gold/40 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs uppercase tracking-wider text-ivory font-medium block">
+                        Exclusive Date Lock
+                      </strong>
+                      <p className="text-xs text-ivory/60 font-light leading-relaxed">
+                        Your wedding date is formally reserved with our single-bride-per-day commitment.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <button
-                onClick={clearSelection}
-                className="text-[11px] uppercase tracking-wider text-ivory/60 hover:text-ivory underline transition-colors px-3 py-1"
-              >
-                Change Selection
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Booking Form Card */}
-        <div className="bg-[#2A2420] border border-gold/30 p-8 sm:p-12 ornate-corners shadow-editorial max-w-3xl mx-auto">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              window.open(generateWhatsAppMessage(), '_blank');
-            }}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Name */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-gold-light block font-medium">
-                  Bride / Client Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="e.g. Radhika Sharma"
-                  className="w-full bg-[#1F1B18] border border-gold/30 px-4 py-3 text-sm text-ivory placeholder-ivory/30 focus:border-gold focus:outline-none transition-colors"
-                />
+            {/* Direct Artist WhatsApp Hotlink Card */}
+            <div className="p-6 bg-[#25201D] border border-gold/30 space-y-3 relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs border-b border-gold/20 pb-3">
+                <span className="uppercase tracking-[0.2em] text-gold font-medium">
+                  Direct WhatsApp Hotline
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Available Now
+                </span>
               </div>
 
-              {/* Phone */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-gold-light block font-medium">
-                  WhatsApp / Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="e.g. +91 98765 43210"
-                  className="w-full bg-[#1F1B18] border border-gold/30 px-4 py-3 text-sm text-ivory placeholder-ivory/30 focus:border-gold focus:outline-none transition-colors"
-                />
-              </div>
+              <p className="text-xs text-ivory/60 font-light leading-relaxed">
+                Have urgent questions about date availability, destination travel rates, or customization?
+              </p>
 
-              {/* Wedding Date */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-gold-light block font-medium">
-                  Ceremony / Wedding Date *
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  required
-                  value={formData.date}
-                  onChange={handleChange}
-                  className="w-full bg-[#1F1B18] border border-gold/30 px-4 py-3 text-sm text-ivory focus:border-gold focus:outline-none transition-colors"
-                />
-              </div>
-
-              {/* City / Venue */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-gold-light block font-medium">
-                  City / Venue Location
-                </label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="e.g. Delhi NCR / Udaipur Palace"
-                  className="w-full bg-[#1F1B18] border border-gold/30 px-4 py-3 text-sm text-ivory placeholder-ivory/30 focus:border-gold focus:outline-none transition-colors"
-                />
+              <div>
+                <a
+                  href={getWhatsAppBookingLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('Contact Section Direct Hotline')}
+                  className="inline-flex items-center gap-2.5 text-gold-light hover:text-ivory font-serif text-xl transition-colors underline underline-offset-4"
+                >
+                  <span>{brandConfig.phoneDisplay}</span>
+                  <span>↗</span>
+                </a>
               </div>
             </div>
 
-            {/* Notes / Special Requests */}
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-gold-light block font-medium">
-                Custom Elements &amp; Notes
-              </label>
-              <textarea
-                name="notes"
-                rows={3}
-                value={formData.notes}
-                onChange={handleChange}
-                placeholder="Mention personalized motifs (hashtags, portraits, baraat, number of family members)..."
-                className="w-full bg-[#1F1B18] border border-gold/30 px-4 py-3 text-sm text-ivory placeholder-ivory/30 focus:border-gold focus:outline-none transition-colors resize-none"
-              />
-            </div>
-
-            {/* Submit Action */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-9 py-4 bg-henna text-ivory text-xs uppercase tracking-[0.22em] border border-gold hover:bg-henna-dark transition-all duration-300 shadow-gold font-medium flex items-center justify-center gap-3"
-              >
-                <span>Send WhatsApp Inquiry</span>
-                <span className="text-gold">✦</span>
-              </button>
-
-              <span className="text-[11px] text-ivory/50">
-                Direct concierge with Master Artist {brandConfig.artistName}
+            {/* Coverage Zones */}
+            <div className="p-6 bg-[#25201D] border border-gold/25 space-y-3">
+              <span className="text-[10px] uppercase tracking-[0.24em] text-gold-dark font-medium block">
+                Primary Doorstep Coverage
               </span>
+              <div className="flex flex-wrap gap-2">
+                {brandConfig.coverageAreas.map((area, idx) => (
+                  <span
+                    key={idx}
+                    className="text-[11px] px-3 py-1 bg-ivory/5 border border-gold/25 text-ivory/80 font-light"
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[11px] text-ivory/50 font-light pt-1">
+                ✦ Outstation &amp; Destination weddings: Travel &amp; stay arranged by client.
+              </p>
             </div>
-          </form>
+
+            <div className="hidden lg:block text-gold/15">
+              <JharokhaArchMotif size={100} />
+            </div>
+          </div>
+
+          {/* Right Column (7 cols): Reusable BookingForm Component */}
+          <div className="lg:col-span-7">
+            <BookingForm />
+          </div>
         </div>
       </div>
     </section>
   );
 };
-

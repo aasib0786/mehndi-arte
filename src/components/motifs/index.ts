@@ -2,4 +2,12 @@ export { PaisleyMotif } from './PaisleyMotif';
 export { MandalaMotif } from './MandalaMotif';
 export { FloralVineMotif } from './FloralVineMotif';
 export { MehndiConeMotif } from './MehndiConeMotif';
-
+export { MakeupBrushMotif } from './MakeupBrushMotif';
+export { LipstickMotif } from './LipstickMotif';
+export { CompactMirrorMotif } from './CompactMirrorMotif';
+export { LotusFloretMotif } from './LotusFloretMotif';
+export { JharokhaArchMotif } from './JharokhaArchMotif';
+export { OrnateCornerFlourish } from './OrnateCornerFlourish';
+export { BrushStrokeFlourish } from './BrushStrokeFlourish';
+export { AtelierSealMotif } from './AtelierSealMotif';
+export { HathphoolChainMotif } from './HathphoolChainMotif';

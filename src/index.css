@@ -19,6 +19,19 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  @media (max-width: 768px) {
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
   }
 
   /* Lenis smooth scroll recommended base */
@@ -44,6 +57,12 @@
   ::selection {
     background-color: rgba(184, 137, 58, 0.25);
     color: #5A1E1B;
+  }
+
+  /* Accessible keyboard focus visible */
+  :focus-visible {
+    outline: 2px solid #B8893A !important;
+    outline-offset: 3px !important;
   }
 }
 
@@ -166,6 +185,42 @@
   background: #5A1E1B;
 }
 
+/* Luxury Editorial Arched Frames */
+.arch-frame-top {
+  border-top-left-radius: 120px;
+  border-top-right-radius: 120px;
+}
+
+.arch-frame-full {
+  border-radius: 120px;
+}
+
+/* Illuminated Drop-Cap for Luxury Bridal Editorial */
+.illuminated-dropcap::first-letter {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.8;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  color: #5A1E1B;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Luxury Deckle Edge & Double Hairline Accents */
+.double-hairline-gold {
+  border: 1px solid rgba(184, 137, 58, 0.35);
+  outline: 1px solid rgba(184, 137, 58, 0.15);
+  outline-offset: 3px;
+}
+
+.postcard-stamp-border {
+  border: 1px dashed rgba(184, 137, 58, 0.45);
+}
+
+
 
 /* Custom Cursor Hiding for Fine Pointer Devices */
 @media (pointer: fine) and (hover: hover) {
@@ -192,4 +247,24 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Marquee Animation for Testimonials */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 45s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

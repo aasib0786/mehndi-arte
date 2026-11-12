@@ -34,6 +34,19 @@ export default {
           muted: '#4A433E',
           soft: '#766D66',
         },
+        // Accents for Makeup & Parlour sections
+        rose: {
+          DEFAULT: '#E8CFC6',
+          soft: '#E8CFC6',
+          light: '#F5EBE6',
+          dark: '#D4B3A8',
+        },
+        blush: {
+          DEFAULT: '#C9A193',
+          nude: '#C9A193',
+          light: '#DEBFB4',
+          dark: '#A67B6C',
+        },
       },
       fontFamily: {
         serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
@@ -50,11 +63,13 @@ export default {
       backgroundImage: {
         'gold-gradient': 'linear-gradient(135deg, #B8893A 0%, #D4A85B 50%, #8C6524 100%)',
         'henna-gradient': 'linear-gradient(135deg, #5A1E1B 0%, #3D1311 100%)',
+        'rose-gradient': 'linear-gradient(135deg, #F5EBE6 0%, #E8CFC6 50%, #C9A193 100%)',
       },
       boxShadow: {
         'fine': '0 1px 3px rgba(35, 31, 28, 0.04), 0 1px 2px rgba(35, 31, 28, 0.02)',
         'editorial': '0 20px 40px -15px rgba(35, 31, 28, 0.07)',
         'gold': '0 10px 30px -10px rgba(184, 137, 58, 0.25)',
+        'rose': '0 10px 30px -10px rgba(201, 161, 147, 0.3)',
       },
       animation: {
         'spin-slow': 'spin 55s linear infinite',
@@ -63,4 +78,3 @@ export default {
   },
   plugins: [],
 };
-

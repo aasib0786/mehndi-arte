@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
 
 export interface SelectedBookingItem {
-  type: 'service' | 'package';
+  type: 'service' | 'package' | 'parlour';
+  category?: 'mehndi' | 'makeup' | 'parlour' | 'combo';
   id: string;
   title: string;
   price?: string;
